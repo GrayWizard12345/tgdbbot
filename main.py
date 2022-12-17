@@ -87,13 +87,13 @@ def read_data_from_db():
         print(e)
 
 def keyboard():
-    markup = ReplyKeyboardMarkup(row_width=2)
+    markup = ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
 
     button1 = KeyboardButton("Save Name")
     button2 = KeyboardButton("Show Data")
-
+    button3 = KeyboardButton("**smile**")
     markup.add(button1, button2)
-
+    markup.add(button3)
     return markup
 
 bot.infinity_polling()
