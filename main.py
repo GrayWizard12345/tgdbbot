@@ -1,20 +1,18 @@
 import telebot
 import sqlite3
 
+from telebot.types import KeyboardButton, ReplyKeyboardMarkup
+
 TOKEN = "5943242364:AAEDa7ko4pgcCKnzSOw7WdvU8eYMH8OWD6M"
 
 bot = telebot.TeleBot(TOKEN, parse_mode=None)
 
 
-@bot.message_handler(commands=['start', 'show_data'])
+@bot.message_handler(commands=['start'])
 def greetings(message):
     reply = "Hello. I am a simple data collection bot!"
-    bot.reply_to(message, reply)
+    bot.reply_to(message, reply, reply_markup=keyboard())
 
-    if message.text == '/show_data':
-        data = read_data_from_db()
-        for datum in data:
-            bot.reply_to(message, str(datum))
 
 
 is_taking_name = False
@@ -45,6 +43,11 @@ def message_handler(message):
     if message.text == 'Save Name':
         is_taking_name = True
         bot.send_message(chat_id, "Input your Name:")
+
+    if message.text == 'Show Data':
+        data = read_data_from_db()
+        for datum in data:
+            bot.reply_to(message, str(datum))
 
 
 def save_data_to_db(name, surname):
@@ -83,5 +86,14 @@ def read_data_from_db():
         print("There was an error with database!")
         print(e)
 
+def keyboard():
+    markup = ReplyKeyboardMarkup(row_width=2)
+
+    button1 = KeyboardButton("Save Name")
+    button2 = KeyboardButton("Show Data")
+
+    markup.add(button1, button2)
+
+    return markup
 
 bot.infinity_polling()
