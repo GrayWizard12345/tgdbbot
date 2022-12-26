@@ -1,7 +1,8 @@
 import telebot
 import sqlite3
 
-from telebot.types import KeyboardButton, ReplyKeyboardMarkup
+from telebot.types import KeyboardButton, ReplyKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, \
+    InlineKeyboardMarkup, InlineKeyboardButton
 
 TOKEN = "5943242364:AAEDa7ko4pgcCKnzSOw7WdvU8eYMH8OWD6M"
 
@@ -54,6 +55,10 @@ def message_handler(message):
 
     if message.text == "Back":
         bot.reply_to(message, "Введите данные:", reply_markup=keyboard())
+
+    if message.text == "Inline":
+        bot.reply_to(message, "Example text for inline keyboard", reply_markup=inline_keyboard())
+
 
 def save_data_to_db(name, surname):
     connection = None
@@ -116,5 +121,30 @@ def next_keyboard():
     return markup
 
 
+def inline_keyboard():
+    markup = InlineKeyboardMarkup(row_width=2)
+
+    button1 = InlineKeyboardButton("Button 1", callback_data='btn_1_pressed')
+    button2 = InlineKeyboardButton("Button 2", callback_data='btn_2_pressed')
+    button3 = InlineKeyboardButton("Button 3", callback_data='btn_3_pressed')
+
+    markup.add(button1, button2)
+    markup.add(button3)
+
+    return markup
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def inline_handler(call):
+    if call.data == 'btn_1_pressed':
+        bot.answer_callback_query(call.id, "Button 1 was pressed")
+    if call.data == 'btn_2_pressed':
+        bot.send_message(call.message.chat.id, "Button 2 was pressed")
+
+    if call.data == 'btn_3_pressed':
+        bot.edit_message_text("Edited message text",
+                              call.message.chat.id,
+                              call.message.id,
+                              reply_markup=inline_keyboard())
 
 bot.infinity_polling()
